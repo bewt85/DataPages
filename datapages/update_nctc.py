@@ -1,12 +1,17 @@
 import argparse
+import collections
+import json
 import logging
+import numpy as np
 import os
 import pandas as pd
 import pickle
 import re
+import shutil
 import yaml
 
 from argparse import ArgumentTypeError, FileType
+from datetime import datetime
 
 from .common import cache_data, reload_cache_data, \
                     _is_dir, _could_write, _could_read, \
@@ -37,7 +42,8 @@ def parse():
 
 def _file_to_ftp_url(path, ftp_root_dir, ftp_root_url):
     root_dir = os.path.abspath(ftp_root_dir)
-    root_dir = root_dir if ftp_root_url[-1] == '/' else root_dir + '/'
+    root_dir = root_dir if root_dir[-1] == '/' else root_dir + '/'
+    root_url = ftp_root_url if ftp_root_url[-1] == '/' else ftp_root_url + '/'
     abspath = os.path.abspath(path)
     return re.sub(root_dir, ftp_root_url, abspath)
 
@@ -177,7 +183,8 @@ def add_canonical_nctc_data(joint_data):
 
 def merge_nctc_data(database_data, automatic_gffs, manual_embls, manual_gffs):
     logger.info("Merger in assembly details")
-    automatic_gffs.rename(columns={'url': 'url_auto_gff', 'path': 'path_auto_gff'})
+    automatic_gffs.rename(columns={'url': 'url_auto_gff', 'path': 'path_auto_gff'},
+                          inplace=True)
     joint_data = pd.merge(database_data, automatic_gffs,
                           left_on='sample_accession_v', right_on='sample_accession',
                           how='left')
