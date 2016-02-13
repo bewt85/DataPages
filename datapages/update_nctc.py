@@ -276,7 +276,7 @@ class NctcConfig(object):
 def generate_nctc_data(global_config, nctc_config):
     if global_config.get('DATAPAGES_LOAD_CACHE_PATH'):
         cache_path = global_config.get('DATAPAGES_LOAD_CACHE_PATH')
-        logging.warn("Loading cached data from %s" % cache_path)
+        logger.warn("Loading cached data from %s" % cache_path)
         data = reload_cache_data(cache_path, nctc_config.nctc_name)
         project_ssids = data['project_ssids']
         ena_run_details = data['ena_run_details']
@@ -285,7 +285,7 @@ def generate_nctc_data(global_config, nctc_config):
         all_paths = data['all_paths']
 
     else:
-        logging.info("Loading data from databases")
+        logger.info("Loading data from databases")
         vrtrack_db_details_list = get_vrtrack_db_details_list(global_config,
                                                          nctc_config.databases)
         sequencescape_db_details = get_sequencescape_db_details(global_config)
@@ -295,7 +295,7 @@ def generate_nctc_data(global_config, nctc_config):
 
     if global_config.get('DATAPAGES_SAVE_CACHE_PATH'):
         cache_path = global_config.get('DATAPAGES_SAVE_CACHE_PATH')
-        logging.warn("Saving data to cache in %s" % cache_path)
+        logger.warn("Saving data to cache in %s" % cache_path)
         project_ssids = list({lane['project_ssid'] for lane in lane_details})
         data = {
             'project_ssids': project_ssids,
