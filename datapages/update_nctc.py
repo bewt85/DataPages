@@ -206,14 +206,12 @@ def merge_nctc_data(database_data, automatic_gffs, manual_embls, manual_gffs):
 
 def _list_run_accessions(group):
     return pd.Series({
-        'Run Accessions': group.unique().tolist()
+        'run_accession': group['run_accession'].unique().tolist()
     })
 
 def _group_run_accessions(data):
     logging.info("Group runs on the same data together")
-    data.columns = prefered_column_names
-    columns_except_run = list(data.columns.values)
-    columns_except_run = columns_except_run.remove('Run Accession')
+    columns_except_run = [c for c in data.columns.values if c != 'run_accession']
     data = data.groupby(columns_except_run).apply(_list_run_accessions)
     data.reset_index(inplace=True)
     return data
@@ -225,10 +223,10 @@ def build_relevant_nctc_data(joint_data, nctc_config):
         ('species_name', 'Species'),
         ('canonical_strain', 'Strain'),
         ('sample_accession_v', 'Sample Accession'),
-        ('run_accession', 'Run Accession'),
-        ('url_man_gff', 'Manual GFF URL'),
+        ('run_accession', 'Run Accessions'),
         ('url_auto_gff', 'Automatic GFF URL'),
-        ('url_auto_embl', 'Automatic EMBL URL'),
+        ('url_man_gff', 'Manual GFF URL'),
+        ('url_man_embl', 'Manual EMBL URL'),
         ('chromosomes', 'Manual Assembly Chromosome Contig Number'),
         ('plasmids', 'Manual Assembly Plasmid Contig Number'),
     ])
@@ -236,19 +234,12 @@ def build_relevant_nctc_data(joint_data, nctc_config):
     prefered_column_names = [column_name_map[key] for key in
                              original_column_names]
 
-    # Don't include data not in ENA
-    data = joint_data[(joint_data['withdrawn'] == False) &
-                     joint_data['run_in_ena'] &
-                     joint_data['study_in_ena']]
-
     # Keep only the relevant project IDs
-    data = data[data['project_ssid'].isin(ntct_config.project_ssids)]
+    data = joint_data[joint_data['project_ssid'].isin(nctc_config.project_ssids)]
 
     # Only include the columns we like
     data = data[original_column_names]
-
-    # Group run accessions
-    data = _group_run_accessions(data)
+    data.rename(columns=column_name_map, inplace=True)
 
     # Deal with aliases
     for alias, original_names in nctc_config.aliases:
@@ -315,7 +306,20 @@ def generate_nctc_data(global_config, nctc_config):
 
     automatic_gffs, manual_embls, manual_gffs = file_mappings(all_paths, nctc_config)
     database_data = merge_data(lane_details, ena_run_details, studies)
-    joint_data = merge_nctc_data(database_data, automatic_gffs, manual_embls,
+
+    # Don't include data not in ENA
+    database_data = database_data[(database_data['withdrawn'] == False) &
+                                   database_data['run_in_ena'] &
+                                   database_data['study_in_ena']]
+
+    # Throw away irrelevant data
+    database_data = database_data[['species_name',
+                                   'canonical_strain',
+                                   'sample_accession_v',
+                                   'run_accession',
+                                   'project_ssid']]
+    grouped_reads = _group_run_accessions(database_data)
+    joint_data = merge_nctc_data(grouped_reads, automatic_gffs, manual_embls,
                                  manual_gffs)
 
     relevant_data = build_relevant_nctc_data(joint_data, nctc_config)
