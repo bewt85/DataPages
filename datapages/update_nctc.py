@@ -242,8 +242,10 @@ def build_relevant_nctc_data(joint_data, nctc_config):
     data.rename(columns=column_name_map, inplace=True)
 
     # Deal with aliases
-    for alias, original_names in nctc_config.aliases:
-        data.loc[df['Species'].isin(original_names), 'Species'] = alias
+    for alias, original_names in nctc_config.aliases.items():
+        data.loc[data['Species'].isin(original_names), 'Species'] = alias
+
+    data.where((pd.notnull(data)), None, inplace=True)
 
     return {
         'columns': prefered_column_names,
@@ -325,25 +327,33 @@ def generate_nctc_data(global_config, nctc_config):
     relevant_data = build_relevant_nctc_data(joint_data, nctc_config)
     return relevant_data
 
+def _row_to_dict(row, columns):
+    return dict(zip(columns, row))
+
 def write_nctc_index(relevant_data, output_dir_root, nctc_config):
     logger.info("Writing results to %s" % output_dir_root)
     now = datetime.now()
     timestamp = now.strftime("%Y%m%d%H%M%S")
-    output_dir = os.path,join(output_dir_root, nctc_config.nctc_name)
-    output_dir_temp = os.path.join(output_dir_root, "%s_%s_temp" %
-                                   (nctc_config.nctc_name, timestamp))
-    os.makedirs(output_dir_temp, mode=0o755)
-    output_file_path = os.path.join(output_dir_temp, 'index.html')
-    output_dir_backup = "%s_backup" % os.path.abspath(output_dir_root)
-    template = get_template('nctc.index.html')
+    output_dir = os.path.join(output_dir_root, nctc_config.nctc_name)
+    os.makedirs(output_dir, exist_ok=True)
+    output_file_path = os.path.join(output_dir, 'index.html')
+    output_file_tmp_path = "%s_%s" % (output_file_path, timestamp)
+    template, env = get_template('nctc.index.html')
+    data = [_row_to_dict(row, relevant_data['columns']) for row in relevant_data['data']]
+    def create_ena_link(accession, text=None):
+      text = text if text is not None else accession
+      return '<a href="http://www.ebi.ac.uk/ena/data/view/%s">%s</a>' % (accession, text)
+    env.filters['ena_link'] = create_ena_link
     content = template.render(
         title="Awesom NCTC page",
         description="A page about the awesome NCTC project",
-        data=json.dumps(relevant_data, sort_keys=True, indent=4,
-                        separators=(',', ': '))
+        data=data,
+        ena_link=create_ena_link
     )
-    with open(output_file_path, 'w') as output_file:
+    with open(output_file_tmp_path, 'w') as output_file:
         print(content, file=output_file)
+    logger.info("Writing output to %s" % output_file_path)
+    shutil.move(output_file_tmp_path, output_file_path)
 
 def main():
     """Load config and update data and index.html files
@@ -403,7 +413,7 @@ def main():
         raise ValueError(message)
 
     data = generate_nctc_data(config, nctc_config)
-    write_nctc_index(relevant_data, site_dir, nctc_config)
+    write_nctc_index(data, site_dir, nctc_config)
 
 if __name__ == '__main__':
     main()

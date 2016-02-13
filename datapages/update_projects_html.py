@@ -15,7 +15,7 @@ def get_template(filename):
     env = Environment(loader=loader)
     template = env.get_template(filename)
     logger.info('Using %s template from %s' % (filename, templates_dir))
-    return template
+    return template, env
 
 def write_domain_index(species_list, output_dir, domain_config):
     domain_name = domain_config.domain_name
@@ -24,7 +24,8 @@ def write_domain_index(species_list, output_dir, domain_config):
     species_urls = {species: species_url(species) for species in
                     species_list}
     index_path = os.path.join(output_dir, domain_name, 'index.html')
-    content = get_template('index.html').render(
+    template, _ = get_template('index.html')
+    content = template.render(
         species_urls=species_urls,
         domain_title=domain_config.domain_title,
         domain_description=domain_config.render_domain_description()

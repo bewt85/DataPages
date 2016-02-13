@@ -12,16 +12,55 @@
                 </div>
                 <table id="data-table" class="display">
                     <thead>
-                          <tr>
-                              <th>Species</th>
-                              <th>Study Name</th>
-                              <th>Study Accession</th>
-                              <th>Sample Name</th>
-                              <th>Strain</th>
-                              <th>Run Accession</th>
-                              <th>Sample Accession</th>
-                          </tr>
-                      </thead>
+                        <tr>
+                            <th>Species</th>
+                            <th>Strain</th>
+                            <th>Sample</th>
+                            <th>Runs</th>
+                            <th>Automated Assembly</th>
+                            <th>Manual Assembly</th>
+                            <th>Manual Assembly Chromosome Contig Number</th>
+                            <th>Manual Assembly Plasmid Contig Number</th>
+                        </tr>
+                    </thead>
+                    </tbody>
+                        {% for row in data -%}
+                        <tr>
+                            <td>{{ row['Species'] }}<td>
+                            <td>{{ ena_link(row['Sample Accession'], row['Strain']) }}<td>
+                            <td>{{ ena_link(row['Sample Accession']) }}<td>
+                            {% if row['Run Accessions'] -%}
+                            <td>{{ row['Run Accessions'] | map('ena_link') | join('<br>') }}<td>
+                            {% else -%}
+                            <td>Pending<td>
+                            {%- endif -%}
+                            {% if row['Automatic GFF URL'] -%}
+                            <td><a href="{{ row['Automatic GFF URL'] }}">GFF</a><td>
+                            {% else -%}
+                            <td>Pending<td>
+                            {%- endif -%}
+                            {% if row['Manual EMBL URL'] != None and row['Manual GFF URL'] != None -%}
+                            <td><a href="{{ row['Manual EMBL URL'] }}">EMBL</a><br><a href="{{ row['Manual GFF URL'] }}">GFF</a><td>
+                            {% elif row['Manual EMBL URL'] != None -%}
+                            <td><a href="{{ row['Manual EMBL URL'] }}">EMBL</a><td>
+                            {% elif row['Manual GFF URL'] != None -%}
+                            <td><a href="{{ row['Manual GFF URL'] }}">GFF</a><td>
+                            {% else -%}
+                            <td>Pending<td>
+                            {%- endif -%}
+                            {% if row['Manual Assembly Chromosome Contig Number'] != None -%}
+                            <td>{{ row['Manual Assembly Chromosome Contig Number'] | int }}<td>
+                            {% else -%}
+                            <td>Pending<td>
+                            {%- endif -%}
+                            {% if row['Manual Assembly Plasmid Contig Number'] != None -%}
+                            <td>{{ row['Manual Assembly Plasmid Contig Number'] | int }}<td>
+                            {% else -%}
+                            <td>Pending<td>
+                            {%- endif %}
+                        </tr>
+                        {% endfor -%}
+                    </tbody>
                 </table>
                 <div id='data-updated'></div>
             </div>
@@ -29,7 +68,6 @@
             <div id="publications" class="display"></div>
         </div>
     </div>
-    {{ data }}
     <div id="rhs">
         <div class="panel">
             <div id="links" class="display"></div>
@@ -45,18 +83,9 @@
             </div>
         </div>
     </div>
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.10/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <style>
-      .scrollable-dropdown {
-          height: auto;
-          max-height: 200px;
-          overflow-x: hidden;
-      }
-    </style>
-    <script src="../assets/js/bootstrap.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.10/js/dataTables.bootstrap.min.js"></script>
 </body>
