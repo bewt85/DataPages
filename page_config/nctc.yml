@@ -16,9 +16,8 @@ project_ssids:
 metadata:
   type: nctc
   name: nctc
+  title: Public Health England reference collections
   description: |
-    ###  Public Health England reference collections
-
     This project aims to provide annotated and assembled genomes for 3,000 bacteria and
     500 viruses as part of a new eResource
 
@@ -85,6 +84,16 @@ metadata:
 
     As viral strains from the collection progress through the project, links to
     the raw sequence data and annotated assemblies will appear here.
+
+  links:
+  - url: http://www.phe-culturecollections.org.uk/aboutus/nctc.aspx
+    text: NCTC
+  - url: http://www.phe-culturecollections.org.uk/aboutus/ncpv.aspx
+    text: NCPV
+  - url: https://twitter.com/nctc_3000
+    text: NCTC 3000 twitter
+  - url: http://www.pacificbiosciences.com/microbe
+    text: PacBio
 
 aliases:
   Peptoclostridium difficile:

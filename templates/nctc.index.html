@@ -81,16 +81,23 @@
             </div>
         </div>
         <div class="panel">
-            <div>
-                <h4>Data Use Statement</h4>
-                <p>This sequencing centre plans on publishing the completed and annotated sequences in a
+            <h4>Links</h4>
+            <ul>
+            {% for link in links %}
+                <li><a href="{{ link['url'] }}">{{ link['text'] }}</a></li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div class="panel">
+            <h4>Data Use Statement</h4>
+            <p>This sequencing centre plans on publishing the completed and annotated sequences in a
 peer-reviewed journal as soon as possible. Permission of the principal investigator should be
 obtained before publishing analyses of the sequence/open reading frames/genes on a chromosome or
 genome scale. See our <a href="/about/who-we-are/policies/open-access-science">data sharing policy</a>.</p>
         </div>
         <div class="panel">
-             <h4>Contact</h4>
-             <p>Please address all sequencing enquiries to
+            <h4>Contact</h4>
+            <p>Please address all sequencing enquiries to
 <a href="mailto:julian.parkhill@sanger.ac.uk">Prof. Julian Parkhill</a>.</p>
         </div>
     </div>

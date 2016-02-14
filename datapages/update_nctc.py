@@ -273,7 +273,9 @@ class NctcConfig(object):
             message = "Expected %s to contain nctc config, got %s; skipping" % (config_file.name, self.type)
             raise ValueError(message)
         self.nctc_name = self.data['metadata']['name']
+        self.title = self.data['metadata']['title']
         self.description = self.data['metadata']['description']
+        self.links = self.data['metadata']['links']
         self.databases = self.data['databases']
         self.ftp_root_dir = self.data['ftp_root_dir']
         self.project_ssids = self.data['project_ssids']
@@ -360,10 +362,11 @@ def write_nctc_index(relevant_data, output_dir_root, nctc_config):
     description = markdown.markdown(nctc_config.description, extensions=['markdown.extensions.tables'])
     stats = relevant_data['stats']
     content = template.render(
-        title="Awesom NCTC page",
+        title=nctc_config.title,
         description=description,
         data=data,
         stats=stats,
+        links=nctc_config.links,
         ena_link=create_ena_link
     )
     with open(output_file_tmp_path, 'w') as output_file:
