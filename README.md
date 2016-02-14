@@ -7,7 +7,7 @@ This repo creates the following scripts which can be used to build static conten
 datasets. 
 
 * `datapages_update_projects`
-* `datapages_update_nctc` (still under development)
+* `datapages_update_nctc`
 
 This code needs priviledged access to some of our databases so it cannot be run outside Sanger.  In addition
 some of the styling and javascript is inherited from the [Sanger website](https://www.sanger.ac.uk) so it isn't
@@ -125,9 +125,64 @@ After that comes the data for each `species`.  This includes the following:
 * `pubmed_ids` is a list of pubmed ids for relevant publications which are rendered into useful citations in the final page
 * `show` defaults to true; when set to false it temporarily hides that species and removes the relevant JSON from `/data`
 
-### `datapages_update_projects`
+### `datapages_update_nctc`
 
-A work in progress, more to follow here.
+This script creates a single static page outlining our NCTC sequence data. **NB This will automatically include virus data when it is sequenced as part of this project**.
+
+Data for these pages is merged from a number of private and public sources:
+* VRTrack database (mostly species name => project mapping and public accession ids)
+* Sequencescape (public names for things like strain and sample name)
+* ENA (to check if the run, project, sample is actually still available for download; if not it isn't displayed)
+* Local config (metadata like database names, descriptive text, etc. see [pages_config](pages_config/nctc.yml))
+* Environment variables / `--global-config` (more sensitive details like database server names and user credentials)
+* The shared file system on which FTP downloads are hosted (to checl which assemblies are available and the statistics for these assemblies)
+
+```
+$ datapages_update_nctc --help
+usage: datapages_update_nctc [-h] [--global-config GLOBAL_CONFIG] [-q]
+                             [-d SITE_DIRECTORY] [--save-cache SAVE_CACHE]
+                             [--load-cache LOAD_CACHE]
+                             nctc_config
+
+positional arguments:
+  nctc_config           Config for the nctc project in YAML
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --global-config GLOBAL_CONFIG
+                        Overide config (e.g. database hosts, users)
+  -q, --quiet           Only output warnings and errors
+  -d SITE_DIRECTORY, --site-directory SITE_DIRECTORY
+                        Directory to update
+  --save-cache SAVE_CACHE
+                        Cache database results to this file
+  --load-cache LOAD_CACHE
+                        Load cached database results from this file
+```
+
+These settings are almost identical to `datapages_update_projects`; the only difference is the structure of the `nctc_config` YAML file.
+
+#### NCTC Config
+
+`databases` is a list of VRTrack databases to query
+
+`ftp_root_dir` is the root directory of the NCTC3000 FTP server.  At runtime, the script recursively finds all the files in this and all child directories.  These are combined with subsequent config variables to identify automatic and manual assemblies.
+
+`automatic_gffs`, `manual_gffs` and `manual_embls` are used to find manual and automatic assemblies.  A `root_dir` file system directory is provided for each of these keys; this is used as part of a regex to identify the existance of the relevant assembly.  A `root_url` is also provided for each key; this is used to calculate the externally accessable URL for the relevant file on our FTP servers.
+
+`project_ssids` are a list of SequenceScape IDs to include in the output.
+
+`metadata` includes some additional descripting content to be rendered within the page
+
+* `type` must be set to `nctc`.  This is a quick check that data has been provided in the corrct format.
+* `name` is used to select the subdirectory in which the finished page should be put.
+* `title` is the title to be rendered at the top of the results page.
+* `description` is markdown fomratted content that will be rendered before the table of data.
+* `links` include a list of links to be included on the right hand side of the page.
+
+`aliases` are used to reformat the names of some sequences.  A list of sequence names is provided for each alias.  Each of the sequences in this list is renamed to the alias specified before being included int he output table.
+
+`blacklist` includes details of strains which should not be included in the output table.
 
 ## Installation
 
