@@ -16,6 +16,76 @@ project_ssids:
 metadata:
   type: nctc
   name: nctc
+  description: |
+    ###  Public Health England reference collections
+
+    This project aims to provide annotated and assembled genomes for 3,000 bacteria and
+    500 viruses as part of a new eResource
+
+    The project is split into two parts:
+
+    ** NCTC 3000 ** : A joint collaboration between Public Health England, Pacific
+    Biosciences and the Wellcome Trust Sanger Institute to complete the sequencing
+    of 3,000 bacterial strains from PHE's National Collection of Type Cultures (NCTC)
+    using Pacific Biosciences' Single Molecule, Real-Time (SMRT) sequencing technology. 
+
+    ** NCPV 500 ** : A collaboration between PHE and Sanger to produce 500 viral genomes
+    from PHE's National Collection of Pathogenic Viruses (NCPV) using the Illumina
+    sequencing platform. 
+
+    Collectively, the data generated will be housed in a publically accessible
+    web-based eResource that integrates metadata and genome sequences for type and
+    reference strains of biomedically important bacterial and viral pathogens.
+    This resource will integrate accession, taxonomy and authentication
+    information with publications, genome sequences, comparative analysis
+    databases and other resources at EMBL and NCBI.
+
+    This is a community resource project. Data will be available from here, and
+    from the NCTC. We will submit assembled, annotated sequences to the
+    International Sequence Databases as they become available. We request that you
+    cite this webpage in any publication using the data, and would appreciate it
+    if you contact us to discuss the use of this data.
+
+    ####  Data Downloads
+
+      * [ Download annotated assemblies ](ftp://ftp.sanger.ac.uk/pub/project/pathogens/NCTC3000/)
+      * [ BLAST server ](/cgi-bin/blast/submitblast/nctc/)
+
+    ** Please note: ** these are pre-submission assemblies that should not be treated as final versions. Assemblies contain both chromosomal and plasmid contigs. 
+
+    ####  Background
+
+    The Wellcome Trust Sanger Institute will generate PacBio sequencing data and
+    provide assembled and annotated genomes for the 3,000 bacteria from the NCTC
+    collection.
+
+    The NCTC is one of the world's premier collections for bacterial strains, but
+    most bacteria in NCTC currently have no genome references. Biological Resource
+    Centres, such as NCTC and NCPV, are a vital part of the infrastructure
+    underpinning life sciences, providing biomaterials of known provenance. Type
+    and reference strains act as landmarks for mapping microbial diversity and
+    measuring unique changes in properties and patterns of infection and response
+    to clinical interventions. Combining reference genomes with the wealth of
+    historical and biological information existing for these strains will generate
+    a data set of enormous value for basic and clinical microbiology.
+
+    Pacific Biosciences' Single Molecule, Real-Time (SMRT) Sequencing technology
+    achieves very long reads and high consensus accuracy, greatly improving the
+    ability to finish bacterial genomes. And, because the technology can directly
+    detect base modifications, the epigenomes for bacteria can also be obtained
+    with no additional data acquisition, and this data will also be provided.
+
+    ####  NCTC Strains
+
+    As bacterial strains from the collection progress through the project, links
+    to the raw sequence data, epigenome data and annotated assemblies will appear
+    here.
+
+    ####  NCPV strains
+
+    As viral strains from the collection progress through the project, links to
+    the raw sequence data and annotated assemblies will appear here.
+
 aliases:
   Peptoclostridium difficile:
   - Clostridium difficile

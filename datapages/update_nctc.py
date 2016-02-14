@@ -2,6 +2,7 @@ import argparse
 import collections
 import json
 import logging
+import markdown
 import numpy as np
 import os
 import pandas as pd
@@ -176,10 +177,10 @@ def add_canonical_nctc_data(joint_data):
     logger.info("Finding canonical names for things")
     _get_default_columns(joint_data, 'chromosomes',
                          ['chromosomes_man_embl', 'chromosomes_man_gff'],
-                         'Pending')
+                         None)
     _get_default_columns(joint_data, 'plasmids',
                          ['plasmids_man_embl', 'plasmids_man_gff'],
-                         'Pending')
+                         None)
 
 def merge_nctc_data(database_data, automatic_gffs, manual_embls, manual_gffs):
     logger.info("Merger in assembly details")
@@ -245,7 +246,7 @@ def build_relevant_nctc_data(joint_data, nctc_config):
     for alias, original_names in nctc_config.aliases.items():
         data.loc[data['Species'].isin(original_names), 'Species'] = alias
 
-    data.where((pd.notnull(data)), None, inplace=True)
+    data = data.where((pd.notnull(data)), None)
 
     return {
         'columns': prefered_column_names,
@@ -262,6 +263,7 @@ class NctcConfig(object):
             message = "Expected %s to contain nctc config, got %s; skipping" % (config_file.name, self.type)
             raise ValueError(message)
         self.nctc_name = self.data['metadata']['name']
+        self.description = self.data['metadata']['description']
         self.databases = self.data['databases']
         self.ftp_root_dir = self.data['ftp_root_dir']
         self.project_ssids = self.data['project_ssids']
@@ -344,9 +346,10 @@ def write_nctc_index(relevant_data, output_dir_root, nctc_config):
       text = text if text is not None else accession
       return '<a href="http://www.ebi.ac.uk/ena/data/view/%s">%s</a>' % (accession, text)
     env.filters['ena_link'] = create_ena_link
+    description = markdown.markdown(nctc_config.description, extensions=['markdown.extensions.tables'])
     content = template.render(
         title="Awesom NCTC page",
-        description="A page about the awesome NCTC project",
+        description=description,
         data=data,
         ena_link=create_ena_link
     )
