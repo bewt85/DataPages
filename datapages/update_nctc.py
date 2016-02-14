@@ -352,6 +352,7 @@ def write_nctc_index(relevant_data, output_dir_root, nctc_config):
     output_file_tmp_path = "%s_%s" % (output_file_path, timestamp)
     template, env = get_template('nctc.index.html')
     data = [_row_to_dict(row, relevant_data['columns']) for row in relevant_data['data']]
+    data = sorted(data, key=lambda row: row['Species'])
     def create_ena_link(accession, text=None):
       text = text if text is not None else accession
       return '<a href="http://www.ebi.ac.uk/ena/data/view/%s">%s</a>' % (accession, text)
