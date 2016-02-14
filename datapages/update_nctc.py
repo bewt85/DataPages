@@ -255,6 +255,12 @@ def build_relevant_nctc_data(joint_data, nctc_config):
     for alias, original_names in nctc_config.aliases.items():
         data.loc[data['Species'].isin(original_names), 'Species'] = alias
 
+    # Check the blacklist
+    data = data[~data['Strain'].isin(nctc_config.blacklist.get('strains', []))]
+    unimplemented_blacklists = [key for key in nctc_config.blacklist.keys() if key != 'strains']
+    if len(unimplemented_blacklists) > 0:
+      logger.warning("The following blacklists are not implemented: %s" % ', '.join(unimplemented_blacklists))
+
     data = data.where((pd.notnull(data)), None)
     stats = _get_nctc_stats(data)
 
@@ -281,6 +287,7 @@ class NctcConfig(object):
         self.ftp_root_dir = self.data['ftp_root_dir']
         self.project_ssids = self.data['project_ssids']
         self.aliases = self.data['aliases']
+        self.blacklist = self.data.get('blacklist', {})
         self.automatic_gffs_dir = self.data['automatic_gffs']['root_dir']
         self.automatic_gffs_url = self.data['automatic_gffs']['root_url']
         self.manual_embls_dir = self.data['manual_embls']['root_dir']
