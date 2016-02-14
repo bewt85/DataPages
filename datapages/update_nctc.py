@@ -42,11 +42,12 @@ def parse():
     return parser.parse_args()
 
 def _file_to_ftp_url(path, ftp_root_dir, ftp_root_url):
+    abspath = os.path.abspath(path)
+    root_url = ftp_root_url if ftp_root_url[-1] == '/' else ftp_root_url + '/'
     root_dir = os.path.abspath(ftp_root_dir)
     root_dir = root_dir if root_dir[-1] == '/' else root_dir + '/'
-    root_url = ftp_root_url if ftp_root_url[-1] == '/' else ftp_root_url + '/'
-    abspath = os.path.abspath(path)
-    return re.sub(root_dir, ftp_root_url, abspath)
+    root_dir = re.compile('^' + re.escape(root_dir))
+    return re.sub(root_dir, root_url, abspath)
 
 def get_all_paths(root_dir):
     logger.info("Finding all the files in %s" % root_dir)
