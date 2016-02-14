@@ -70,7 +70,15 @@
     </div>
     <div id="rhs">
         <div class="panel">
-            <div id="links" class="display"></div>
+            <div id="stats" class="display">
+                <h4>Current Statistics</h4>
+                <ul>
+                    <li>Number of species sequenced: {{ stats['sequences'] }}</li>
+                    <li>Number of samples: {{ stats['samples'] }}</li>
+                    <li>Number of samples manually assembled: {{ stats['manual_assemblies'] }}</li>
+                    <li>Number of samples automatically assembled: {{ stats['automatic_assemblies'] }}</li>
+                </ul>
+            </div>
         </div>
         <div class="panel">
             <div>

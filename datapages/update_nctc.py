@@ -217,6 +217,14 @@ def _group_run_accessions(data):
     data.reset_index(inplace=True)
     return data
 
+def _get_nctc_stats(data):
+    return {
+      'sequences': len(data['Species'].unique()),
+      'samples': len(data['Sample Accession'].unique()),
+      'manual_assemblies': data[['Manual EMBL URL', 'Manual GFF URL']].any(axis=1).sum(),
+      'automatic_assemblies': len(data['Automatic GFF URL'].dropna()) 
+    }
+
 def build_relevant_nctc_data(joint_data, nctc_config):
     logger.info("Reformatting data for export")
     now = datetime.now()
@@ -247,11 +255,13 @@ def build_relevant_nctc_data(joint_data, nctc_config):
         data.loc[data['Species'].isin(original_names), 'Species'] = alias
 
     data = data.where((pd.notnull(data)), None)
+    stats = _get_nctc_stats(data)
 
     return {
         'columns': prefered_column_names,
         'count': len(data.index),
         'data': data.values.tolist(),
+        'stats': stats,
         'updated': now.isoformat()
     }
 
@@ -347,10 +357,12 @@ def write_nctc_index(relevant_data, output_dir_root, nctc_config):
       return '<a href="http://www.ebi.ac.uk/ena/data/view/%s">%s</a>' % (accession, text)
     env.filters['ena_link'] = create_ena_link
     description = markdown.markdown(nctc_config.description, extensions=['markdown.extensions.tables'])
+    stats = relevant_data['stats']
     content = template.render(
         title="Awesom NCTC page",
         description=description,
         data=data,
+        stats=stats,
         ena_link=create_ena_link
     )
     with open(output_file_tmp_path, 'w') as output_file:
