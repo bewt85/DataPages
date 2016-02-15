@@ -212,17 +212,20 @@ def _list_run_accessions(group):
     })
 
 def _group_run_accessions(data):
-    logging.info("Group runs on the same data together")
+    logging.info("Group runs together for the same sample / strain")
     columns_except_run = [c for c in data.columns.values if c != 'run_accession']
     data = data.groupby(columns_except_run).apply(_list_run_accessions)
     data.reset_index(inplace=True)
     return data
 
 def _get_nctc_stats(data):
+    """Calculate the counts of various things
+
+    For example the number of sequences"""
     return {
       'sequences': len(data['Species'].unique()),
       'samples': len(data['Sample Accession'].unique()),
-      'manual_assemblies': data[['Manual EMBL URL', 'Manual GFF URL']].any(axis=1).sum(),
+      'manual_assemblies': int(data[['Manual EMBL URL', 'Manual GFF URL']].any(axis=1).sum()),
       'automatic_assemblies': len(data['Automatic GFF URL'].dropna()) 
     }
 
@@ -336,7 +339,7 @@ def generate_nctc_data(global_config, nctc_config):
                                    database_data['run_in_ena'] &
                                    database_data['study_in_ena']]
 
-    # Throw away irrelevant data
+    # Throw away irrelevant columns
     database_data = database_data[['species_name',
                                    'canonical_strain',
                                    'sample_accession_v',
@@ -353,7 +356,7 @@ def _row_to_dict(row, columns):
     return dict(zip(columns, row))
 
 def write_nctc_index(relevant_data, output_dir_root, nctc_config):
-    logger.info("Writing results to %s" % output_dir_root)
+    logger.info("Writing results HTML to %s" % output_dir_root)
     now = datetime.now()
     timestamp = now.strftime("%Y%m%d%H%M%S")
     output_dir = os.path.join(output_dir_root, nctc_config.nctc_name)
@@ -379,7 +382,20 @@ def write_nctc_index(relevant_data, output_dir_root, nctc_config):
     )
     with open(output_file_tmp_path, 'w') as output_file:
         print(content, file=output_file)
-    logger.info("Writing output to %s" % output_file_path)
+    logger.info("Writing HTML output to %s" % output_file_path)
+    shutil.move(output_file_tmp_path, output_file_path)
+
+def write_nctc_json(relevant_data, output_dir_root, nctc_config):
+    logger.info("Writing results JSON to %s" % output_dir_root)
+    now = datetime.now()
+    timestamp = now.strftime("%Y%m%d%H%M%S")
+    output_dir = os.path.join(output_dir_root, nctc_config.nctc_name)
+    os.makedirs(output_dir, exist_ok=True)
+    output_file_path = os.path.join(output_dir, 'nctc.json')
+    output_file_tmp_path = "%s_%s" % (output_file_path, timestamp)
+    with open(output_file_tmp_path, 'w') as output_file:
+        json.dump(relevant_data, output_file)
+    logger.info("Writing JSON output to %s" % output_file_path)
     shutil.move(output_file_tmp_path, output_file_path)
 
 def main():
@@ -440,6 +456,7 @@ def main():
         raise ValueError(message)
 
     data = generate_nctc_data(config, nctc_config)
+    write_nctc_json(data, site_dir, nctc_config)
     write_nctc_index(data, site_dir, nctc_config)
 
 if __name__ == '__main__':

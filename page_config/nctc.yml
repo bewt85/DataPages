@@ -86,6 +86,8 @@ metadata:
     the raw sequence data and annotated assemblies will appear here.
 
   links:
+  - url: nctc.json
+    text: These data in JSON format
   - url: http://www.phe-culturecollections.org.uk/aboutus/nctc.aspx
     text: NCTC
   - url: http://www.phe-culturecollections.org.uk/aboutus/ncpv.aspx
