@@ -23,40 +23,40 @@
                             <th>Manual Assembly Plasmid Contig Number</th>
                         </tr>
                     </thead>
-                    </tbody>
+                    <tbody>
                         {% for row in data -%}
                         <tr>
-                            <td>{{ row['Species'] }}<td>
-                            <td>{{ ena_link(row['Sample Accession'], row['Strain']) }}<td>
-                            <td>{{ ena_link(row['Sample Accession']) }}<td>
+                            <td>{{ row['Species'] }}</td>
+                            <td>{{ ena_link(row['Sample Accession'], row['Strain']) }}</td>
+                            <td>{{ ena_link(row['Sample Accession']) }}</td>
                             {% if row['Run Accessions'] -%}
-                            <td>{{ row['Run Accessions'] | map('ena_link') | join('<br>') }}<td>
+                            <td>{{ row['Run Accessions'] | map('ena_link') | join('<br>') }}</td>
                             {% else -%}
-                            <td>Pending<td>
+                            <td>Pending</td>
                             {%- endif -%}
                             {% if row['Automatic GFF URL'] -%}
-                            <td><a href="{{ row['Automatic GFF URL'] }}">GFF</a><td>
+                            <td><a href="{{ row['Automatic GFF URL'] }}">GFF</a></td>
                             {% else -%}
-                            <td>Pending<td>
+                            <td>Pending</td>
                             {%- endif -%}
                             {% if row['Manual EMBL URL'] != None and row['Manual GFF URL'] != None -%}
-                            <td><a href="{{ row['Manual EMBL URL'] }}">EMBL</a><br><a href="{{ row['Manual GFF URL'] }}">GFF</a><td>
+                            <td><a href="{{ row['Manual EMBL URL'] }}">EMBL</a><br><a href="{{ row['Manual GFF URL'] }}">GFF</a></td>
                             {% elif row['Manual EMBL URL'] != None -%}
-                            <td><a href="{{ row['Manual EMBL URL'] }}">EMBL</a><td>
+                            <td><a href="{{ row['Manual EMBL URL'] }}">EMBL</a></td>
                             {% elif row['Manual GFF URL'] != None -%}
-                            <td><a href="{{ row['Manual GFF URL'] }}">GFF</a><td>
+                            <td><a href="{{ row['Manual GFF URL'] }}">GFF</a></td>
                             {% else -%}
-                            <td>Pending<td>
+                            <td>Pending</td>
                             {%- endif -%}
                             {% if row['Manual Assembly Chromosome Contig Number'] != None -%}
-                            <td>{{ row['Manual Assembly Chromosome Contig Number'] | int }}<td>
+                            <td>{{ row['Manual Assembly Chromosome Contig Number'] | int }}</td>
                             {% else -%}
-                            <td>Pending<td>
+                            <td>Pending</td>
                             {%- endif -%}
                             {% if row['Manual Assembly Plasmid Contig Number'] != None -%}
-                            <td>{{ row['Manual Assembly Plasmid Contig Number'] | int }}<td>
+                            <td>{{ row['Manual Assembly Plasmid Contig Number'] | int }}</td>
                             {% else -%}
-                            <td>Pending<td>
+                            <td>Pending</td>
                             {%- endif %}
                         </tr>
                         {% endfor -%}
@@ -106,4 +106,9 @@ genome scale. See our <a href="/about/who-we-are/policies/open-access-science">d
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <script src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.10/js/dataTables.bootstrap.min.js"></script>
+    <script>
+    $(document).ready(function() {
+      $("#data-table").DataTable();
+    })
+    </script>
 </body>
